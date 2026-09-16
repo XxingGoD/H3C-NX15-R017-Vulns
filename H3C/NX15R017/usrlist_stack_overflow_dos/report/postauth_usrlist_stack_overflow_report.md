@@ -169,4 +169,5 @@ PID constant at 5508 for 20 s  -> recovered
 
 - Firmware download portal:
   <https://www.h3c.com/cn/Service/Document_Software/Software_Download/Consume_product/>
-- Companion analysis: the sibling directories in this repository.
+- Companion reports for the same firmware: see the sibling
+  directories of this one (each contains its own report and PoC).

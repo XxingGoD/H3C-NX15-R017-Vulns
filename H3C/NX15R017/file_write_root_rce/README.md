@@ -71,4 +71,4 @@ CVSS:3.1/AV:N/AC:L/PR:H/UI:N/S:U/C:H/I:H/A:H   (7.2)
 `/etc/shadow` (mode 0600, owner root) succeeds. Both methods therefore operate
 with more authority than their "file management" role suggests.
 
-Companion analysis: the sibling directories in this repository.
+See [`../README.md`](../README.md) for the per-product index and how the primitives relate.

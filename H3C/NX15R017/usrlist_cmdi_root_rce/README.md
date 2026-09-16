@@ -72,4 +72,4 @@ buffer overflow in the same function is reported separately as a denial of
 service (`usrlist_stack_overflow_dos`); please see that report for why remote
 code execution was not demonstrated.
 
-Companion analysis: the sibling directories in this repository.
+See [`../README.md`](../README.md) for the per-product index and how the primitives relate.

@@ -93,4 +93,4 @@ are documented in the report, so the PoC is fully reproducible. Callers should
 be aware that the method has unavoidable destructive side effects on
 `/mnt/config` even when the import fails.
 
-Companion analysis: the sibling directories in this repository.
+See [`../README.md`](../README.md) for the per-product index and how the primitives relate.

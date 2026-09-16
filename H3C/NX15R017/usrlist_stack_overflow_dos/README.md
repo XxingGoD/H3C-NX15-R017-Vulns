@@ -66,4 +66,4 @@ The `C:N/I:N` and `A:H` values are deliberate: only denial of service was
 demonstrated. The related command injection in the same function is reported
 separately (`usrlist_cmdi_root_rce`), where execution as root **is** proven.
 
-Companion analysis: the sibling directories in this repository.
+See [`../README.md`](../README.md) for the per-product index and how the primitives relate.
