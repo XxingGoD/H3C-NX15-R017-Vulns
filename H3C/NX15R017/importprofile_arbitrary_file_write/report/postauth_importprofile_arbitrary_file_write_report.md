@@ -114,7 +114,7 @@ primitive overwrites existing files on the read-only-by-image root filesystem
 > `json.dumps`; using a control character as the sentinel fails because
 > `json.dumps` escapes it to `\u0000`.
 
-## 5. Destructive side effect — `/mnt/config`
+## 5. Normal behaviour — the `/mnt/config` wipe
 
 `lib/preinit/79_mount_h3c` establishes a two-level configuration scheme:
 
@@ -126,9 +126,11 @@ fi
 cp -rf /mnt/config/* /etc/config              # every boot: persistent -> live
 ```
 
-So `rm -rvf /mnt/config/*` destroys the **persistent** layer while `/etc/config`
-(and therefore current operation) stays intact — until the next reboot, when the
-device falls back to factory values.
+This wipe is the feature's own normal behaviour — it runs on every import,
+legitimate or not — so it is a hazard to note when testing rather than an
+attacker capability. `rm -rvf /mnt/config/*` destroys the **persistent** layer
+while `/etc/config` (and therefore current operation) stays intact — until the
+next reboot, when the device falls back to factory values.
 
 Whether the device also reboots into the wizard state depends on whether the
 marker write succeeds:

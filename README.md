@@ -58,11 +58,13 @@ not a prerequisite vulnerability: neither finding requires the other.
 | new file with executable bit | **no** (0644) | yes (tar mode) |
 | symbolic link | **no** | yes (tar `SYMTYPE`) |
 | create directory | **no** | yes |
-| delete file/directory | **no** | yes |
 
 A new file created by `file.write` is 0644 and cannot be run by `file.exec`; the
 same payload delivered by `importprofile` with `mode=0755` executes and returns
 `uid=0(root)`.
+
+`importprofile` adds no delete primitive: its two `rm` calls are the feature's
+own fixed-path / temp-file housekeeping, not attacker-controlled deletion.
 
 ## Scope and honesty notes
 

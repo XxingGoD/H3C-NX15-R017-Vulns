@@ -11,10 +11,11 @@
 # by a product/version string and an MD5 that the attacker supplies. The payload
 # is "encrypted" by a single-byte XOR with 0x55 (the whole of /usr/bin/file_encrypt).
 #
-# !!!  WARNING — DESTRUCTIVE SIDE EFFECT
-# !!!  This method also runs `rm -rvf /mnt/config/*`, wiping the PERSISTENT
-# !!!  configuration layer (a jffs2 mount copied over /etc/config at boot).
-# !!!  The device keeps working until reboot, after which it may come up in the
+# !!!  WARNING — the import runs `rm -rvf /mnt/config/*` as part of its NORMAL
+# !!!  operation (this is what the feature does on every profile import, not an
+# !!!  extra bug).  It wipes the PERSISTENT configuration layer (a jffs2 mount
+# !!!  copied over /etc/config at boot), so the PoC is disruptive: the device
+# !!!  keeps working until reboot, after which it may come up in the
 # !!!  factory / setup-wizard state.  Only run this against a device you own or
 # !!!  are explicitly authorised to test, and expect to reconfigure it afterwards.
 #

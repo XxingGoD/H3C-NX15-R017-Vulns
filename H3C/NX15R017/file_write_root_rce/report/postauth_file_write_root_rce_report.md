@@ -143,11 +143,15 @@ are complementary rather than redundant.
 | **new file with executable bit** | **no** (0644) | yes (tar member mode) |
 | **symbolic link** | **no** (no such API) | yes (tar `SYMTYPE`) |
 | **create directory** | **no** | yes |
-| **delete file/directory** | **no** (truncate to 0 only) | yes (`rm -rvf /mnt/config/*`) |
 
 Demonstrated: a script written by `file.write` to a *new* path is not executable
 via `file.exec` (no output, no artefact), whereas the same script delivered by
 `importprofile` with `mode=0755` executes and produces `uid=0(root)`.
+
+`importprofile` provides no delete primitive: its two `rm` calls are the
+feature's own fixed-path / temp-file housekeeping (`rm -rvf /mnt/config/*` on
+every legitimate import, `rm -rf "${_path}"` to discard an invalid upload), not
+attacker-controlled deletion.
 
 ## 7. Relationship to existing advisories
 

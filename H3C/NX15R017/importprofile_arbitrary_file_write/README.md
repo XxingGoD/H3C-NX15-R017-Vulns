@@ -24,35 +24,55 @@ and an MD5 checksum, both of which the attacker chooses.
 `../file_write_root_rce/`: it needs no archive, no validation bypass and no
 `type=cfg` handling — one JSON object writes any path as root.
 
-`importprofile` remains a distinct finding because it is the only primitive that
-can express four things `file.write` cannot:
+`importprofile` remains a distinct finding because it can express three things
+`file.write` cannot:
 
 | Capability | `file.write` | `importprofile` |
 |---|---|---|
 | new file with **executable bit** | no (0644) | yes (tar member mode) |
 | **symbolic link** | no (no such API) | yes (tar `SYMTYPE`) |
 | **create directory** | no | yes |
-| **delete** file/directory | no (truncate to 0 only) | yes (`rm -rvf /mnt/config/*`) |
 
-All four were verified on the device: a script written by `file.write` to a new
+All three were verified on the device: a script written by `file.write` to a new
 path is not runnable via `file.exec`, while the same script delivered by
 `importprofile` with `mode=0755` executes and returns `uid=0(root)`; a symlink
-member is resolved normally when read back; and `importprofile`'s internal
-`rm -rf` is the only deletion primitive available in this firmware.
+member is resolved normally when read back.
 
-The destructive `/mnt/config` behaviour described below is therefore an
-`importprofile`-specific risk, not shared with `file.write`.
+`importprofile` adds **no** delete primitive. It contains two `rm` calls, but
+both are the feature's normal housekeeping rather than an attacker-controlled
+capability:
+
+```sh
+if ! is_valid_cfg "${_path}"; then
+    rm -rf "${_path}" /tmp/"${hostName}"*      # discard the invalid upload
+    code=532
+else
+    rm -rvf /mnt/config/* > /dev/null          # clear the persistent layer, then import
+    cd / && tar -xzvf /tmp/"${hostName}".tar.gz > /dev/null
+fi
+```
+
+The first discards the just-uploaded container (`_path` is built by the CGI as
+`/tmp/<fileName>`, subject to a `.cfg` suffix check); the second wipes a fixed
+path as the first step of every *legitimate* profile import. Neither is
+attacker-directed, so the `/mnt/config` wipe described below is normal import
+behaviour — a hazard to be aware of when running the PoC, not an additional
+vulnerability class.
 
 ## Impact
 
 - **Create or overwrite any file on the root filesystem** as root — verified by
   writing `XGCTF{}` to `/www/download/flag.txt` and reading it back over HTTP.
-- **Configuration destruction**: the method also executes
-  `rm -rvf /mnt/config/*`, wiping the persistent configuration layer
-  (`/mnt/config` is a jffs2 mount that is copied over `/etc/config` at boot). If
-  `uci -c /mnt/config commit` then succeeds, the device reboots into the
-  factory / setup-wizard state, in which `/api/wizard/config` is reachable
-  without authentication. This forms a self-sustaining chain:
+
+## Normal behaviour to expect — `/mnt/config`
+
+Every import — legitimate or not — starts by running `rm -rvf /mnt/config/*`,
+wiping the persistent configuration layer (`/mnt/config` is a jffs2 mount that
+is copied over `/etc/config` at boot). That is the feature's own behaviour, not
+an attacker capability; it matters here because it makes the PoC disruptive. If
+`uci -c /mnt/config commit` then succeeds, the device reboots into the
+factory / setup-wizard state, in which `/api/wizard/config` is reachable
+without authentication — a consequence to be aware of when testing:
 
   ```text
   importprofile (authenticated) -> wipe persistent config + set marker
@@ -90,7 +110,7 @@ CVSS:3.1/AV:N/AC:L/PR:H/UI:N/S:U/C:H/I:H/A:H   (7.2)
 
 The XOR-"encryption" routine (`XOR 0x55`, self-inverse) and the archive layout
 are documented in the report, so the PoC is fully reproducible. Callers should
-be aware that the method has unavoidable destructive side effects on
-`/mnt/config` even when the import fails.
+be aware that a successful import wipes `/mnt/config` as part of its normal
+operation (see *Normal behaviour to expect* above).
 
 See [`../README.md`](../README.md) for the per-product index and how the primitives relate.
